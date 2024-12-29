@@ -1,0 +1,104 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Datatables Cdn -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<!-- Datatables Cdn -->
+<script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-pZ40T3iL913MGQy1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="../assets/libs/node-waves/waves.min.js"></script>
+<script>
+    function checkPayment(token, orderId) {
+        snap.pay(token, {
+            onSuccess: function(result) {
+                Swal.fire({
+                    title: 'Success',
+                    text: "Pesanan Berhasil Dibayar",
+                    timer: 1000,
+                    showConfirmButton: false,
+                    icon: 'success'
+                })
+            },
+            onPending: function(result) {
+            },
+            onError: function(result) {},
+            onClose: function() {}
+        });
+    }
+</script>
+<div id="content-load"></div>
+<script>
+    $.ajax({
+        url: "/order/new",  // URL untuk mendapatkan data
+        type: "GET",  // Metode request
+        success: function (response) {
+            $("#content-load").html(response);  // Menyisipkan response ke dalam elemen dengan id "content-load"
+        },
+        error: function (xhr, status, error) {
+            Toast.fire({
+                icon: "error",
+                title: error
+            });
+        }
+    });
+    $("#new-order-button").on("click", function (e) {
+        TopLoaderService.start()
+        $.ajax({
+            url: "/order/new",  // URL untuk mendapatkan data
+            type: "GET",  // Metode request
+            success: function (response) {
+                $("#content-load").html(response);  // Menyisipkan response ke dalam elemen dengan id "content-load"
+                TopLoaderService.end()
+            },
+            error: function (xhr, status, error) {
+                Toast.fire({
+                    icon: "error",
+                    title: error
+                });
+            }
+        });
+    });
+    $("#list-order-button").on("click", function (e) {
+        TopLoaderService.start()
+        $.ajax({
+            url: "/order/list",  // URL untuk mendapatkan data
+            type: "GET",  // Metode request
+            success: function (response) {
+                $("#content-load").html(response);  // Menyisipkan response ke dalam elemen dengan id "content-load"
+                TopLoaderService.end()
+            },
+            error: function (xhr, status, error) {
+                Toast.fire({
+                    icon: "error",
+                    title: error
+                });
+            }
+        });
+    });
+    function checkPaymentStatus(orderId) {
+        TopLoaderService.start()
+        $.ajax({
+            url: `/api/order/check-status?id=${orderId}`,  // URL untuk mendapatkan data
+            type: "GET",  // Metode request
+            success: function (response) {
+                listOrder.ajax.reload();
+                TopLoaderService.end()
+            },
+            error: function (xhr, status, error) {
+                Toast.fire({
+                    icon: "error",
+                    title: error
+                });
+            }
+        });
+    }
+</script>

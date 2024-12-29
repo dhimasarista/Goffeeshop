@@ -1,0 +1,225 @@
+<div class="container-fluid">
+    <style>
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: none;
+        }
+
+        .floating-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+        integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <!-- Page Header -->
+    <div class="my-4 page-header-breadcrumb d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+            <h1 class="page-title fw-medium fs-18 mb-2">Orders</h1>
+            <div>
+                <nav>
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">List</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">New</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+        <div class="d-flex gap-2"></div>
+    </div>
+    <!-- Page Header Close -->
+
+ 
+    <!-- Start::row-1 -->
+    <div class="row">
+        <div class="col-xxl-12">
+            <div class="row" id="1234567">
+                <!-- Data -->
+                {{#products}}
+                <div class="col-xxl-3 col-lg-6 col-xl-4 col-sm-6">
+                    <div class="card custom-card card-style-2">
+                        <div class="card-body p-0">
+                            <span class="badge bg-primary rounded py-1 top-left-badge">24% Off</span>
+                            <div class="card-img-top p-2 border-bottom border-block-end-dashed">
+                                <div class="img-box-2 bg-primary-transparent">
+                                    <img src="https://images.unsplash.com/photo-1652507733698-b0c536a92cd4?q=80&w=1950&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                                        alt="img" class="scale-img img-fluid w-100 rounded">
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <h6 class="mb-1 fw-semibold fs-16">
+                                    <a href="#">{{name}}</a>
+                                </h6>
+                                <div class="d-flex align-items-end justify-content-between flex-wrap">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-baseline fs-11">
+                                            <div class="min-w-fit-content">
+                                                <span class="text-warning"><i class="bi bi-star-fill"></i></span>
+                                                <span class="text-warning"><i class="bi bi-star-fill"></i></span>
+                                                <span class="text-warning"><i class="bi bi-star-fill"></i></span>
+                                                <span class="text-warning"><i class="bi bi-star-half"></i></span>
+                                            </div>
+                                            <p class="mb-1 ms-1 min-w-fit-content text-muted">
+                                                <span>(563)</span> <span>Ratings</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-fit-content">
+                                        <h5 class="fw-semibold mb-0" id="price_{{id}}">IDR {{price}}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-3 pt-0 d-grid">
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="decrementQuantity('{{ id }}')">-</button>
+                                    <input id="quantity_{{id}}" type="number" name="quantities[]" value="0" min="0"
+                                        class="form-control text-center" disabled>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="incrementQuantity('{{ id }}', '{{ price }}', '{{ name }}')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/products}}
+                <!-- Data -->
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="invoiceModalLabel">Invoice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul id="invoice-items" class="list-group">
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="payButton" class="btn btn-primary">Bayar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var selectedProducts = [];
+        var modal = new bootstrap.Modal(document.getElementById('invoiceModal'));
+        function showModal() {
+            modal.show();
+        }
+
+        function hideModal() {
+            modal.hide()
+        }
+
+        function incrementQuantity(productId, price, name) {
+            const input = document.getElementById(`quantity_${productId}`);
+            input.value = parseInt(input.value) + 1;
+            addToSelectedProducts(productId, price, name);
+        }
+
+        function decrementQuantity(productId) {
+            const input = document.getElementById(`quantity_${productId}`);
+            if (parseInt(input.value) > 0) {
+                input.value = parseInt(input.value) - 1;
+                removeFromSelectedProducts(productId);
+            }
+        }
+
+        function addToSelectedProducts(productId, price, name) {
+            const index = selectedProducts.findIndex(item => item.productId === productId);
+            if (index === -1) {
+                selectedProducts.push({ productId, price, name, quantity: 1 });
+            } else {
+                selectedProducts[index].quantity += 1;
+            }
+        }
+
+        function removeFromSelectedProducts(productId) {
+            const index = selectedProducts.findIndex(item => item.productId === productId);
+            if (index !== -1) {
+                selectedProducts[index].quantity -= 1;
+                if (selectedProducts[index].quantity === 0) {
+                    selectedProducts.splice(index, 1);
+                }
+            }
+        }
+
+        function displaySelectedProducts() {
+            if (selectedProducts.length === 0) {
+                Swal.fire({
+                    title: 'Pilih Item Terlebih dahulu',
+                    text: "",
+                    timer: 1000,
+                    showConfirmButton: false,
+                    icon: 'warning'
+                });
+                return;
+            }
+
+            const invoiceItems = document.getElementById('invoice-items');
+            invoiceItems.innerHTML = '';
+
+            selectedProducts.forEach(item => {
+                console.log(item);
+                console.log(item.name);
+
+                const totalPrice = parseInt(item.price) * item.quantity;
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center fw-medium';
+                listItem.innerHTML = `${item.name}: ${item.quantity}x <span class="badge bg-dark text-white">IDR ${totalPrice}</span>`;
+                invoiceItems.appendChild(listItem);
+            });
+
+            showModal(); // Show modal after displaying the invoice
+        }
+        // Event listener untuk tombol 'Bayar'
+        document.getElementById('payButton').addEventListener('click', async () => {
+            $.ajax({
+                url: "/api/order",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ products: selectedProducts }),
+                success: function (result, textStatus, xhr) {
+                    checkPayment(result["transaction_token"], result["order_id"])
+                },
+                error: function (result) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: JSON.stringify(result, null, 2),
+                        icon: 'error'
+                    });
+                },
+                complete: function (data) {
+                    selectedProducts = [];
+                    document.querySelectorAll('input[type="number"]').forEach(input => {
+                        input.value = 0;
+                    });
+                    hideModal();
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            // socket.on('alert', (result) => {
+            //     checkPayment(result.transactionToken, result.orderId)
+            // });
+        })
+
+    </script>
+    <!--End::row-1 -->
+    <button class="floating-btn btn btn-primary" onclick="displaySelectedProducts()">
+        <i class="ti ti-shopping-cart-check"></i> Checkout
+    </button>
+</div>
