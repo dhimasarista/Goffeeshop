@@ -21,5 +21,4 @@ func (is *IndexService) Index() ([]models.Product, error) {
 		return nil, err
 	}
 	return products, nil
-
 }

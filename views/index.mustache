@@ -26,7 +26,9 @@
                     timer: 1000,
                     showConfirmButton: false,
                     icon: 'success'
-                })
+                }).then((result) => {
+                    checkPaymentStatus(orderId)
+                });
             },
             onPending: function(result) {
             },
@@ -91,7 +93,11 @@
             type: "GET",  // Metode request
             success: function (response) {
                 listOrder.ajax.reload();
-                TopLoaderService.end()
+                TopLoaderService.end();
+                Toast.fire({
+                    icon: "info",
+                    title: response["status_message"]
+                });
             },
             error: function (xhr, status, error) {
                 Toast.fire({

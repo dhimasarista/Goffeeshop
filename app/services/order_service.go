@@ -124,11 +124,11 @@ func (os *OrderService) PostOrder(ctx *fiber.Ctx) (map[string]any, error) {
 	return data, nil
 }
 
-func (os *OrderService) CheckPaymentStatus(orderID string) (any, error) {
+func (os *OrderService) CheckPaymentStatus(orderID string) (map[string]any, error) {
 	url := fmt.Sprintf("https://api.sandbox.midtrans.com/v2/%s/status", orderID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Note: ambil ke config ga kebaca
@@ -141,21 +141,22 @@ func (os *OrderService) CheckPaymentStatus(orderID string) (any, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	var midtransResp map[string]any
 	if err := json.NewDecoder(resp.Body).Decode(&midtransResp); err != nil {
-		return "", err
+		return nil, err
 	}
 	err = os.OrderRepo.DB.Transaction(func(tx *gorm.DB) error {
-		var status string
+		var status string = "pending"
 		if midtransResp["transaction_status"] != nil {
 			// set transaction status based on response from check transaction status
 			if midtransResp["transaction_status"] == "capture" {
 				if midtransResp["fraud_status"] == "challenge" {
 					// TODO set transaction status on your database to 'challenge'
 					// e.g: 'Payment status challenged. Please take action on your Merchant Administration Portal
+					status = "challenged"
 				} else if midtransResp["fraud_status"] == "accept" {
 					// TODO set transaction status on your database to 'success'
 					status = "success"
@@ -174,6 +175,8 @@ func (os *OrderService) CheckPaymentStatus(orderID string) (any, error) {
 				// TODO set transaction status on your databaase to 'pending' / waiting payment
 				status = "waiting"
 			}
+		} else {
+			status = "cancel"
 		}
 
 		if err := tx.Model(&models.Order{}).Where("id = ?", orderID).Update("status", status).Error; err != nil {
@@ -184,5 +187,10 @@ func (os *OrderService) CheckPaymentStatus(orderID string) (any, error) {
 		return nil
 	})
 
-	return midtransResp["transaction_status"], nil
+	return midtransResp, nil
+
+	// return map[string]any{
+	// 	"status_code":    midtransResp["status_code"],
+	// 	"status_message": midtransResp["status_message"],
+	// }, nil
 }

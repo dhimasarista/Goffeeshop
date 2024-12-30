@@ -17,10 +17,9 @@ func NewProductRepository(db *gorm.DB) *ProductRepository {
 
 func (repo *ProductRepository) All() ([]models.Product, error) {
 	var products []models.Product
-
 	err := repo.DB.Find(&products).Error
 	if err != nil {
-		log.Println("Error get all products: ", err)
+		log.Println("Error fetching products:", err)
 		return nil, err
 	}
 

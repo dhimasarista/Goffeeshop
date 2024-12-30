@@ -41,7 +41,5 @@ func (controller *OrderController) CheckPaymentStatus(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": response,
-	})
+	return ctx.Status(fiber.StatusOK).JSON(response)
 }
