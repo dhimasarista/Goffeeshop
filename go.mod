@@ -19,6 +19,9 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/gofiber/template v1.8.3 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
+	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/gomodule/redigo v1.8.4 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -44,8 +47,9 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.1.1 // indirect
-	github.com/gofiber/contrib/websocket v1.3.2
+	github.com/gofiber/contrib/websocket v1.3.2 // indirect
 	github.com/google/uuid v1.6.0
+	github.com/googollee/go-socket.io v1.7.0
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect

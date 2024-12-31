@@ -1,7 +1,6 @@
 package services
 
 import (
-	"Goffeeshop/app/config"
 	"Goffeeshop/app/models"
 	"Goffeeshop/app/repositories"
 	"database/sql"
@@ -115,7 +114,6 @@ func (os *OrderService) PostOrder(ctx *fiber.Ctx) (map[string]any, error) {
 			return err
 		}
 
-		config.NotifyAllSocketIOClient("/ws/order/new", fmt.Sprintf("New Order: %s", orderId))
 		return nil
 	})
 
@@ -185,7 +183,6 @@ func (os *OrderService) CheckPaymentStatus(orderID string) (map[string]any, erro
 			log.Println("Error OrderService.PostOrder:", err)
 			return err
 		}
-		config.NotifyAllSocketIOClient("/ws/order/new", fmt.Sprintf("Order %s Status is %s", orderID, midtransResp["transaction_status"]))
 
 		return nil
 	})

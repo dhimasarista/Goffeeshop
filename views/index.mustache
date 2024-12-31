@@ -1,5 +1,20 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script>
+    const socket = io("http://localhost:3000");
+    socket.on("connect", () => {
+        console.log("Connected to server:", socket.id);
+        socket.emit("message", "Hello from client!");
+    });
 
+    socket.on("reply", (msg) => {
+        console.log("Server replied:", msg);
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.log("Disconnected:", reason);
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Datatables Cdn -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
@@ -16,58 +31,7 @@
 <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
     data-client-key="SB-Mid-client-pZ40T3iL913MGQy1"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="../assets/libs/node-waves/waves.min.js"></script>
 <script>
-    // Websockets
-    const wsOrder = new WebSocket('ws://localhost:3000/ws/order/new');
-    wsOrder.onopen = () => {
-        console.log(`Connected to WebSocket server on route: /ws/order/new`);
-        // Kirim pesan ke server
-        wsOrder.send(JSON.stringify({ type: "ping", message: "Hello Server!" }));
-    };
-
-    // Ketika pesan diterima dari server
-    wsOrder.onmessage = (event) => {
-        console.log("Message received from server:", event.data);
-    };
-
-    // Ketika koneksi ditutup
-    wsOrder.onclose = (event) => {
-        console.log("WebSocket connection closed:", event);
-    };
-
-    // Ketika terjadi error
-    wsOrder.onerror = (error) => {
-        Toast.fire({
-            icon: "error",
-            title: error
-        });
-    };
-    const wsOrderStatus = new WebSocket('ws://localhost:3000/ws/order/status');
-    wsOrderStatus.onopen = () => {
-        console.log(`Connected to WebSocket server on route: /ws/order/status`);
-        // Kirim pesan ke server
-        wsOrderStatus.send(JSON.stringify({ type: "ping", message: "Hello Server!" }));
-    };
-
-    // Ketika pesan diterima dari server
-    wsOrderStatus.onmessage = (event) => {
-        console.log("Message received from server:", event.data);
-    };
-
-    // Ketika koneksi ditutup
-    wsOrderStatus.onclose = (event) => {
-        console.log("WebSocket connection closed:", event);
-    };
-
-    // Ketika terjadi error
-    wsOrderStatus.onerror = (error) => {
-        Toast.fire({
-            icon: "error",
-            title: error
-        });
-    };
-
     function checkPayment(token, orderId) {
         snap.pay(token, {
             onSuccess: function (result) {
@@ -81,8 +45,8 @@
                 $.ajax({
                     url: `/api/order/check-status?id=${orderId}`,  // URL untuk mendapatkan data
                     type: "GET",  // Metode request
-                    success: function (response) {},
-                    error: function (xhr, status, error) {}
+                    success: function (response) { },
+                    error: function (xhr, status, error) { }
                 });
             },
             onPending: function (result) {

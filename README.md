@@ -1,12 +1,16 @@
 # Go Go Power Ranger
 
 - **Web Framework**: Golang Fiber.
-- **Template Engine**: Kumis.
+- **Template Engine**: Mustache.
 - **DBMS**: Maisequel.
-- **Midtrans**: Layanan pembayaran memproses transaksi pembayaran.
+- **Midtrans**: Payment Gateway Service.
 - **SocketIO**: Notif Real-Time.
 - **Design Pattern**: Repository, Service, Model.
 - **Dependency Injection**: Manual cuy.
+
+> Note: Fasthttp engine perlu di brige ke http menggunakan adaptor biar socketio bisa digunakan
+
+## SQL
 
 ```sql
 -- Tabel Products

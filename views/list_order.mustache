@@ -135,12 +135,12 @@
                 },
             ]
         });
-        wsOrder.onmessage = (event) => {
+        socket.on("newOrder", function(response) {
             listOrder.ajax.reload();
             Toast.fire({
                 icon: "info",
-                title: event.data
+                title: response
             });
-        };
+        });
     </script>
 </div>

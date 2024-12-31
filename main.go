@@ -6,14 +6,15 @@ import (
 	"Goffeeshop/app/repositories"
 	"Goffeeshop/app/services"
 	"Goffeeshop/app/utilities"
-	"fmt"
 	"log"
+	"net/http"
 
-	"github.com/gofiber/contrib/socketio"
-	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/mustache/v2"
+
+	socketio "github.com/googollee/go-socket.io"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
 func main() {
@@ -23,7 +24,36 @@ func main() {
 	if db == nil {
 		log.Fatal("Failed to connect to the database")
 	}
+	// SocketIO
+	server := socketio.NewServer(nil) // socketio
+	server.OnConnect("/", func(s socketio.Conn) error {
+		log.Println("Client connected:", s.ID())
+		s.Join("room1") // Contoh join ke sebuah room
+		return nil
+	})
+	// Event handler untuk menerima pesan
+	server.OnEvent("/", "message", func(s socketio.Conn, msg string) {
+		log.Printf("Received message: %s from %s", msg, s.ID())
+		s.Emit("reply", "Message received: "+msg)
+	})
+	// Event handler untuk menerima pesan
+	server.OnEvent("/", "newOrder", func(s socketio.Conn, msg string) {
+		s.Emit("newOrder", "New Order: "+msg)
+	})
 
+	// Event handler untuk disconnect
+	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
+		log.Println("Client disconnected:", s.ID(), "Reason:", reason)
+	})
+	// Goroutine untuk menjalankan Socket.IO server
+	go func() {
+		if err := server.Serve(); err != nil {
+			log.Fatalf("Socket.IO server error: %v", err)
+		}
+	}()
+	defer server.Close()
+
+	// Fiber App
 	engine := mustache.New("./views", ".mustache")
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -33,15 +63,6 @@ func main() {
 	})
 
 	// middlewares
-	app.Use("/ws", func(c *fiber.Ctx) error {
-		// IsWebSocketUpgrade returns true if the client
-		// requested upgrade to the WebSocket protocol.
-		if websocket.IsWebSocketUpgrade(c) {
-			c.Locals("allowed", true)
-			return c.Next()
-		}
-		return fiber.ErrUpgradeRequired
-	})
 	app.Static("/", "./public")
 
 	// init midtrans
@@ -57,7 +78,7 @@ func main() {
 
 	// Init Controller
 	indexController := controllers.NewIndexController(indexService, productRepo)
-	orderController := controllers.NewOrderController(orderService)
+	orderController := controllers.NewOrderController(orderService, server)
 
 	// Routes Web
 	app.Get("/", func(c *fiber.Ctx) error {
@@ -67,6 +88,11 @@ func main() {
 	app.Get("/order/list", indexController.ListOrder)
 	app.Get("/order/new", indexController.NewOrder)
 
+	app.Get("/call", func(ctx *fiber.Ctx) error {
+		server.BroadcastToRoom("/", "room1", "newOrder", "New Order")
+		return ctx.JSON(fiber.Map{})
+	})
+
 	// Routes Api
 	app.Route("/api", func(api fiber.Router) {
 		api.Post("/order", orderController.PostOrder)
@@ -74,58 +100,16 @@ func main() {
 		api.Get("/order/check-status", orderController.CheckPaymentStatus)
 	})
 
-	// SocketIO
-	socketio.On(socketio.EventConnect, func(ep *socketio.EventPayload) {
-		fmt.Printf("Connection event 1 - User: %s", ep.Kws.GetStringAttribute("user_id"))
+	// Integrasi Socket.IO dengan Fiber
+	app.All("/socket.io/*", func(c *fiber.Ctx) error {
+		// Gunakan fasthttpadaptor untuk menjembatani handler
+		fasthttpadaptor.NewFastHTTPHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			server.ServeHTTP(w, r)
+		}))(c.Context())
+		return nil
 	})
-
-	socketio.On(socketio.EventDisconnect, func(ep *socketio.EventPayload) {
-		// Remove the user from the local clients
-		delete(config.SocketIOClient, ep.Kws.GetStringAttribute("user_id"))
-		fmt.Printf("Disconnection event - User: %s", ep.Kws.GetStringAttribute("user_id"))
-	})
-
-	socketio.On(socketio.EventClose, func(ep *socketio.EventPayload) {
-		// Remove the user from the local clients
-		delete(config.SocketIOClient, ep.Kws.GetStringAttribute("user_id"))
-		fmt.Printf("Close event - User: %s", ep.Kws.GetStringAttribute("user_id"))
-	})
-
-	socketio.On(socketio.EventError, func(ep *socketio.EventPayload) {
-		fmt.Printf("Error event - User: %s", ep.Kws.GetStringAttribute("user_id"))
-	})
-
-	app.Get("/ws", socketio.New(func(kws *socketio.Websocket) {
-		kws.Broadcast([]byte("Another User Connected"), true, socketio.TextMessage)
-	}))
-	// Websocket Routes using SocketIO
-	app.Get("/ws/order/new", socketio.New(func(kws *socketio.Websocket) {
-		userId := kws.UUID
-		config.AddSocketIOClient("/ws/order/new", userId, kws)
-		kws.SetAttribute("user_id", userId)
-
-		kws.Broadcast([]byte("New Order"), true, socketio.TextMessage)
-
-		// kws.Emit([]byte(fmt.Sprintf("Hello user: %s", userId)), socketio.TextMessage)
-	}))
-	app.Get("/ws/order/status", socketio.New(func(kws *socketio.Websocket) {
-		userId := kws.UUID
-		config.AddSocketIOClient("/ws/order/status", userId, kws)
-		kws.SetAttribute("user_id", userId)
-
-		kws.Broadcast([]byte("Order Status"), true, socketio.TextMessage)
-
-		// kws.Emit([]byte(fmt.Sprintf("Hello user: %s", userId)), socketio.TextMessage)
-	}))
 
 	app.Get("/metrics", monitor.New())
 
 	log.Fatal(app.Listen(":3000"))
-}
-
-type MessageObject struct {
-	Data  string `json:"data"`
-	From  string `json:"from"`
-	Event string `json:"event"`
-	To    string `json:"to"`
 }
