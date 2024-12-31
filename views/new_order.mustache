@@ -8,13 +8,11 @@
             border-radius: 10px;
             font-size: 16px;
             color: white;
-            background-color: #007BFF;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border: none;
-        }
-
-        .floating-btn:hover {
             background-color: #0056b3;
+            z-index: 1000;
+            /* Pastikan tombol memiliki z-index yang lebih tinggi */
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"
@@ -36,7 +34,7 @@
     </div>
     <!-- Page Header Close -->
 
- 
+
     <!-- Start::row-1 -->
     <div class="row">
         <div class="col-xxl-12">
@@ -212,7 +210,7 @@
 
     </script>
     <!--End::row-1 -->
-    <button class="floating-btn btn btn-primary" onclick="displaySelectedProducts()">
+    <button class="floating-btn btn" onclick="displaySelectedProducts()">
         <i class="ti ti-shopping-cart-check"></i> Checkout
     </button>
 </div>
