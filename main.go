@@ -6,8 +6,11 @@ import (
 	"Goffeeshop/app/repositories"
 	"Goffeeshop/app/services"
 	"Goffeeshop/app/utilities"
+	"fmt"
 	"log"
 
+	"github.com/gofiber/contrib/socketio"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/mustache/v2"
@@ -28,7 +31,18 @@ func main() {
 			return c.Redirect("/") // Handling for nothing routes
 		},
 	})
-	app.Static("/", "./public") // Middleware untuk menyediakan file static
+
+	// middlewares
+	app.Use("/ws", func(c *fiber.Ctx) error {
+		// IsWebSocketUpgrade returns true if the client
+		// requested upgrade to the WebSocket protocol.
+		if websocket.IsWebSocketUpgrade(c) {
+			c.Locals("allowed", true)
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
+	app.Static("/", "./public")
 
 	// init midtrans
 	config.NewMidtransConfig()
@@ -60,7 +74,58 @@ func main() {
 		api.Get("/order/check-status", orderController.CheckPaymentStatus)
 	})
 
+	// SocketIO
+	socketio.On(socketio.EventConnect, func(ep *socketio.EventPayload) {
+		fmt.Printf("Connection event 1 - User: %s", ep.Kws.GetStringAttribute("user_id"))
+	})
+
+	socketio.On(socketio.EventDisconnect, func(ep *socketio.EventPayload) {
+		// Remove the user from the local clients
+		delete(config.SocketIOClient, ep.Kws.GetStringAttribute("user_id"))
+		fmt.Printf("Disconnection event - User: %s", ep.Kws.GetStringAttribute("user_id"))
+	})
+
+	socketio.On(socketio.EventClose, func(ep *socketio.EventPayload) {
+		// Remove the user from the local clients
+		delete(config.SocketIOClient, ep.Kws.GetStringAttribute("user_id"))
+		fmt.Printf("Close event - User: %s", ep.Kws.GetStringAttribute("user_id"))
+	})
+
+	socketio.On(socketio.EventError, func(ep *socketio.EventPayload) {
+		fmt.Printf("Error event - User: %s", ep.Kws.GetStringAttribute("user_id"))
+	})
+
+	app.Get("/ws", socketio.New(func(kws *socketio.Websocket) {
+		kws.Broadcast([]byte("Another User Connected"), true, socketio.TextMessage)
+	}))
+	// Websocket Routes using SocketIO
+	app.Get("/ws/order/new", socketio.New(func(kws *socketio.Websocket) {
+		userId := kws.UUID
+		config.AddSocketIOClient("/ws/order/new", userId, kws)
+		kws.SetAttribute("user_id", userId)
+
+		kws.Broadcast([]byte("New Order"), true, socketio.TextMessage)
+
+		// kws.Emit([]byte(fmt.Sprintf("Hello user: %s", userId)), socketio.TextMessage)
+	}))
+	app.Get("/ws/order/status", socketio.New(func(kws *socketio.Websocket) {
+		userId := kws.UUID
+		config.AddSocketIOClient("/ws/order/status", userId, kws)
+		kws.SetAttribute("user_id", userId)
+
+		kws.Broadcast([]byte("Order Status"), true, socketio.TextMessage)
+
+		// kws.Emit([]byte(fmt.Sprintf("Hello user: %s", userId)), socketio.TextMessage)
+	}))
+
 	app.Get("/metrics", monitor.New())
 
 	log.Fatal(app.Listen(":3000"))
+}
+
+type MessageObject struct {
+	Data  string `json:"data"`
+	From  string `json:"from"`
+	Event string `json:"event"`
+	To    string `json:"to"`
 }

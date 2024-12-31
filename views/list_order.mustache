@@ -13,11 +13,8 @@
             </div>
         </div>
         <div class="btn-list">
-            <button class="btn btn-primary-light btn-wave me-2 waves-effect waves-light">
-                <i class="bx bx-crown align-middle"></i> Plan Upgrade
-            </button>
-            <button class="btn btn-secondary-light btn-wave me-0 waves-effect waves-light">
-                <i class="ri-upload-cloud-line align-middle"></i> Export Report
+            <button class="btn btn-info btn-wave me-2 waves-effect waves-light" onclick="listOrder.ajax.reload()">
+                <i class="bx bx-crown align-middle"></i> Refresh
             </button>
         </div>
     </div>
@@ -138,5 +135,12 @@
                 },
             ]
         });
+        wsOrder.onmessage = (event) => {
+            listOrder.ajax.reload();
+            Toast.fire({
+                icon: "info",
+                title: event.data
+            });
+        };
     </script>
 </div>

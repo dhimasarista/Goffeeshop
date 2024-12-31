@@ -208,14 +208,10 @@
                         input.value = 0;
                     });
                     hideModal();
+                    wsOrder.send(JSON.stringify({ }));
                 }
             });
         });
-        document.addEventListener('DOMContentLoaded', function () {
-            // socket.on('alert', (result) => {
-            //     checkPayment(result.transactionToken, result.orderId)
-            // });
-        })
 
     </script>
     <!--End::row-1 -->
