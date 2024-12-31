@@ -1,5 +1,7 @@
 # Go Go Power Ranger
 
+![1735639829899](image/README/1735639829899.png)
+
 - **Web Framework**: Golang Fiber.
 - **Template Engine**: Mustache.
 - **DBMS**: Maisequel.
@@ -9,6 +11,8 @@
 - **Dependency Injection**: Manual cuy.
 
 > Note: Fasthttp engine perlu di brige ke http menggunakan adaptor biar socketio bisa digunakan
+
+![1735639872388](image/README/1735639872388.png)
 
 ## SQL
 
