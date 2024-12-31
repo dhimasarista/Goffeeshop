@@ -48,6 +48,6 @@ func (controller *OrderController) CheckPaymentStatus(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	controller.SocketServer.BroadcastToNamespace("/", "paymentStatus", response)
+	controller.SocketServer.BroadcastToRoom("/", "room1", "newOrder", "false")
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }

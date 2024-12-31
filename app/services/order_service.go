@@ -118,7 +118,7 @@ func (os *OrderService) PostOrder(ctx *fiber.Ctx) (map[string]any, error) {
 	})
 
 	data := map[string]any{
-		"orderId":           orderId,
+		"order_id":          orderId,
 		"transaction_token": transactionToken,
 	}
 	return data, nil

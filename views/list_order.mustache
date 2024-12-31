@@ -137,10 +137,12 @@
         });
         socket.on("newOrder", function(response) {
             listOrder.ajax.reload();
-            Toast.fire({
-                icon: "info",
-                title: response
-            });
+            if (response === "false") {
+                Toast.fire({
+                    icon: "info",
+                    title: response
+                });
+            }
         });
     </script>
 </div>

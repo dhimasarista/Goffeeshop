@@ -41,13 +41,14 @@
                     timer: 1000,
                     showConfirmButton: false,
                     icon: 'success'
+                }).then((result) => {
+                    $.ajax({
+                        url: `/api/order/check-status?id=${orderId}`, 
+                        type: "GET",  // Metode request
+                        success: function (response) { },
+                        error: function (xhr, status, error) { }
+                    });
                 })
-                $.ajax({
-                    url: `/api/order/check-status?id=${orderId}`,  // URL untuk mendapatkan data
-                    type: "GET",  // Metode request
-                    success: function (response) { },
-                    error: function (xhr, status, error) { }
-                });
             },
             onPending: function (result) {
             },
