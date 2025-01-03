@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/mustache/v2"
@@ -60,6 +61,8 @@ func main() {
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			return c.Redirect("/") // Handling for nothing routes
 		},
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
 	})
 
 	// middlewares

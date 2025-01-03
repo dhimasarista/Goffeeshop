@@ -17,6 +17,7 @@ require (
 	github.com/fasthttp/websocket v1.5.11 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/gofiber/template v1.8.3 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
