@@ -6,9 +6,9 @@
 - **Template Engine**: Mustache.
 - **DBMS**: Maisequel.
 - **Midtrans**: Payment Gateway Service.
-- **SocketIO**: Notif Real-Time.
+- **SocketIO**: Real-Time Response.
 - **Design Pattern**: Repository, Service, Model.
-- **Dependency Injection**: Manual cuy.
+- **Dependency Injection**:
 
 > Note: Fasthttp engine perlu di brige ke http menggunakan adaptor biar socketio bisa digunakan
 
