@@ -3,6 +3,7 @@
 ![1735639829899](image/README/1735639829899.png)
 
 - **Web Framework**: Golang Fiber.
+- **Go Project Layout**: False
 - **Template Engine**: Mustache.
 - **DBMS**: Maisequel.
 - **Midtrans**: Payment Gateway Service.
