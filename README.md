@@ -3,7 +3,8 @@
 ![1735639829899](image/README/1735639829899.png)
 
 - **Web Framework**: Golang Fiber.
-- **Go Project Layout**: False
+- **Go Project Layout**: Cobra
+- **Configuration**: Viper
 - **Template Engine**: Mustache.
 - **DBMS**: Maisequel.
 - **Midtrans**: Payment Gateway Service.
@@ -12,6 +13,8 @@
 - **Dependency Injection**:
 
 > Note: Fasthttp engine perlu di brige ke http menggunakan adaptor biar socketio bisa digunakan
+
+> Run App: go run main.go engine start
 
 ![1735639872388](image/README/1735639872388.png)
 
