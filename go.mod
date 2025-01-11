@@ -9,6 +9,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/template/mustache/v2 v2.0.12
 	github.com/midtrans/midtrans-go v1.3.8
+	github.com/spf13/cobra v1.8.1
 	gorm.io/gorm v1.25.12
 )
 
@@ -33,7 +34,6 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

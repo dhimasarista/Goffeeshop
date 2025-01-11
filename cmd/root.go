@@ -18,6 +18,7 @@ import (
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/mustache/v2"
 
@@ -108,6 +109,7 @@ func startServer() {
 	})
 
 	// middlewares
+	app.Use(cors.New())
 	app.Static("/", "./public")
 
 	// init midtrans

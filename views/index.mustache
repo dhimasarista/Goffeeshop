@@ -1,6 +1,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
 <script>
-    const socket = io("http://localhost:3000");
+    const socket = io("http://localhost:3000", {
+        transports: ['polling', 'websocket'],
+        withCredentials: true,  // Mengirimkan kredensial seperti cookies
+    });
     socket.on("connect", () => {
         console.log("Connected to server:", socket.id);
         socket.emit("message", "Hello from client!");
