@@ -110,7 +110,7 @@ func startServer() {
 
 	// middlewares
 	app.Use(cors.New())
-	app.Static("/", "../public")
+	app.Static("/", "./public")
 
 	// init midtrans
 	config.NewMidtransConfig()
