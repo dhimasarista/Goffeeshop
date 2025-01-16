@@ -32,7 +32,7 @@ func (repo *OrderRepository) WithOrderItem() ([]map[string]any, error) {
 	var formattedOrders []map[string]any
 
 	// Load orders beserta relasi OrderItems dan Product
-	err := repo.DB.Preload("OrderItems.Product").Find(&orders).Error
+	err := repo.DB.Debug().Preload("OrderItems.Product").Order("orders.created_at DESC").Find(&orders).Error
 	if err != nil {
 		log.Println("Error while fetching orders:", err)
 		return nil, err
