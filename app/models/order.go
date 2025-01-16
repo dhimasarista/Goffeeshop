@@ -11,6 +11,7 @@ type Order struct {
 	TotalAmount      sql.NullInt64  `gorm:"column:total_amount" json:"total_amount"`
 	TransactionToken sql.NullString `json:"transaction_token" gorm:"column:transaction_token"`
 
+	// One To Many
 	OrderItems []OrderItem `gorm:"foreignKey:OrderID;references:ID"`
 
 	// Timestamp
