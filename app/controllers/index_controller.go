@@ -48,3 +48,23 @@ func (controller *IndexController) NewOrder(ctx *fiber.Ctx) error {
 		"products": simplifiedData,
 	})
 }
+func (controller *IndexController) NewOrderApi(ctx *fiber.Ctx) error {
+	products, err := controller.ProductRepo.All()
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	var simplifiedData []map[string]any
+	for _, product := range products {
+		data := map[string]any{
+			"id":    product.ID.String,
+			"name":  product.Name.String,
+			"price": product.Price.Int64,
+		}
+
+		simplifiedData = append(simplifiedData, data)
+	}
+
+	return ctx.Status(200).JSON(fiber.Map{
+		"products": simplifiedData,
+	})
+}

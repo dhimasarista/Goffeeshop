@@ -7,9 +7,7 @@ import (
 	"os"
 
 	"Goffeeshop/app/config"
-	"Goffeeshop/app/controllers"
-	"Goffeeshop/app/repositories"
-	"Goffeeshop/app/services"
+	"Goffeeshop/app/routes"
 	"Goffeeshop/app/utilities"
 	"log"
 	"net/http"
@@ -115,38 +113,15 @@ func startServer() {
 	// init midtrans
 	config.NewMidtransConfig()
 
-	// Init Repo
-	productRepo := repositories.NewProductRepository(db)
-	orderRepo := repositories.NewOrderRepository(db)
-
-	// Init Service
-	indexService := services.NewIndexService(productRepo)
-	orderService := services.NewOrderService(orderRepo, productRepo)
-
-	// Init Controller
-	indexController := controllers.NewIndexController(indexService, productRepo)
-	orderController := controllers.NewOrderController(orderService, server)
-
 	// Routes Web
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Redirect("/order")
-	})
-	app.Get("/order", indexController.Index)
-	app.Get("/order/list", indexController.ListOrder)
-	app.Get("/order/new", indexController.NewOrder)
+	routes.Web(app, db, server)
+	// Routes Api
+	routes.ApiRoutes(app, db, server)
 
 	app.Get("/call", func(ctx *fiber.Ctx) error {
 		server.BroadcastToRoom("/", "room1", "newOrder", "New Order")
 		return ctx.JSON(fiber.Map{})
 	})
-
-	// Routes Api
-	app.Route("/api", func(api fiber.Router) {
-		api.Post("/order", orderController.PostOrder)
-		api.Get("/order/list", orderController.GetAllOrder).Name("")
-		api.Get("/order/check-status", orderController.CheckPaymentStatus)
-	})
-
 	// Integrasi Socket.IO dengan Fiber
 	app.All("/socket.io/*", func(c *fiber.Ctx) error {
 		// Gunakan fasthttpadaptor untuk menjembatani handler
