@@ -32,7 +32,7 @@ func NewOrderService(orderRepo *repositories.OrderRepository, productRepo *repos
 	return &OrderService{
 		OrderRepo:   orderRepo,
 		ProductRepo: productRepo,
-	} // Menggunakan OrderRepo yang bertipe *repositories.OrderRepository
+	}
 }
 
 func (os *OrderService) GetAllOrder() ([]map[string]interface{}, error) {
