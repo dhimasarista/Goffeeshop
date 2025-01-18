@@ -8,7 +8,6 @@ import (
 type OrderItem struct {
 	ID       sql.NullString `json:"id" gorm:"primaryKey;column:id"`
 	Quantity sql.NullInt64  `gorm:"column:quantity" json:"quantity"`
-	Amount   sql.NullInt64  `gorm:"column:amount" json:"amount"`
 
 	// foreign key
 	OrderID   sql.NullString `json:"order_id" gorm:"column:order_id"`
