@@ -38,7 +38,6 @@
                                 <th>Total Amount</th>
                                 <th>Products</th>
                                 <th>Order Time</th>
-                                <th>Payment Time</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -111,12 +110,6 @@
                 },
                 {
                     data: 'created_at',
-                    render: function(data, type, row) {
-                        const formattedDate = new Date(data).toLocaleString("id-ID");
-                        return formattedDate;
-                    }
-                },{
-                    data: 'updated_at',
                     render: function(data, type, row) {
                         const formattedDate = new Date(data).toLocaleString("id-ID");
                         return formattedDate;
