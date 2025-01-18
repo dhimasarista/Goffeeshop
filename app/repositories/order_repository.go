@@ -46,7 +46,6 @@ func (repo *OrderRepository) WithOrderItem() ([]map[string]any, error) {
 			products = append(products, map[string]any{
 				"name":     orderItem.Product.Name.String,
 				"quantity": orderItem.Quantity.Int64,
-				"amount":   orderItem.Amount.Int64,
 			})
 		}
 
