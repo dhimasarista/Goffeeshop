@@ -48,7 +48,7 @@ func (controller *IndexController) NewOrder(ctx *fiber.Ctx) error {
 		"products": simplifiedData,
 	})
 }
-func (controller *IndexController) NewOrderApi(ctx *fiber.Ctx) error {
+func (controller *IndexController) ProductList(ctx *fiber.Ctx) error {
 	products, err := controller.ProductRepo.All()
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})

@@ -24,8 +24,8 @@ func ApiRoutes(app *fiber.App, db *gorm.DB, server *socketio.Server) {
 	orderController := controllers.NewOrderController(orderService, server)
 	app.Route("/api", func(api fiber.Router) {
 		api.Post("/order", orderController.PostOrder)
-		api.Get("/order/list", orderController.GetAllOrder).Name("")
+		api.Get("/order/list", orderController.GetAllOrder)
 		api.Get("/order/check-status", orderController.CheckPaymentStatus)
-		api.Get("/order/new", indexController.NewOrderApi)
+		api.Get("/product/list", indexController.ProductList)
 	})
 }
