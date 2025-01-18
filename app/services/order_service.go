@@ -91,7 +91,6 @@ func (os *OrderService) PostOrder(ctx *fiber.Ctx) (map[string]any, error) {
 			if err := tx.Create(&models.OrderItem{
 				ID:        sql.NullString{String: uuid.New().String(), Valid: true},
 				Quantity:  sql.NullInt64{Int64: int64(item.Quantity), Valid: true},
-				Amount:    sql.NullInt64{Int64: int64(amount), Valid: true},
 				OrderID:   sql.NullString{String: orderId, Valid: true},
 				ProductID: sql.NullString{String: product.ID.String, Valid: true},
 			}).Error; err != nil {
